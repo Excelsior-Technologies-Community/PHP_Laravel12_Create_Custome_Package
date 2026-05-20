@@ -3,37 +3,40 @@
 namespace DemoVendor\DemoPackage\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Blade;
+use DemoVendor\DemoPackage\Commands\InstallPackage;
+
 class DemoPackageServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function register(): void
     {
-        // Load routes
-        $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
-
-        // Load views
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'demopackage');
-
-        // Publish config and views
-        $this->publishes([
-            __DIR__.'/../../config/demopackage.php' => config_path('demopackage.php'),
-            __DIR__.'/../../resources/views' => resource_path('views/vendor/demopackage'),
-        ], 'demopackage');
-
-         //  Register middleware alias
-        $router = $this->app->make(Router::class);
-
-        $router->aliasMiddleware(
-            'demopackage.log',
-            \DemoVendor\DemoPackage\Middleware\LogPackageUsage::class
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/demopackage.php', 'demopackage'
         );
     }
 
-    public function register()
+    public function boot(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../../config/demopackage.php',
-            'demopackage'
-        );
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'demopackage');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallPackage::class,
+            ]);
+
+            $this->publishes([
+                __DIR__ . '/../../config/demopackage.php' => config_path('demopackage.php'),
+            ], 'demopackage-config');
+
+            $this->publishes([
+                __DIR__ . '/../../public' => public_path('vendor/demopackage'),
+            ], 'demopackage-assets');
+        }
+
+        Blade::directive('demoVersion', function () {
+            return "<?php echo 'DemoPackage v1.0.0'; ?>";
+        });
     }
 }
