@@ -1,18 +1,23 @@
 {
     "name": "demovendor/demopackage",
-    "description": "Demo Laravel 12 Custom Package",
+    "description": "Demo Laravel Custom Package",
     "type": "library",
     "authors": [
         {
-            "name": "Your Nmae",
+            "name": "Your Name",
             "email": "your@example.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^8.2"
+    },
     "autoload": {
         "psr-4": {
             "DemoVendor\\DemoPackage\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
@@ -20,5 +25,6 @@
                 "DemoVendor\\DemoPackage\\Providers\\DemoPackageServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "stable"
 }
