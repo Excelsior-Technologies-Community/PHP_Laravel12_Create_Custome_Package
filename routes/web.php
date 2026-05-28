@@ -2,21 +2,21 @@
 
 use Illuminate\Support\Facades\Route;
 use DemoVendor\DemoPackage\Controllers\DemoController;
-
+use App\Http\Controllers\DemoPackageController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\DemoPackageController;
-
 Route::get('/app-demo-package', [DemoPackageController::class, 'index']);
-
-
-// Route using the package controller
 Route::get('/demo', [DemoController::class, 'index']);
-
-// Optional: simple route directly to view
 Route::get('/demo-view', function () {
-    return view('demopackage::index'); // loads published package view
+    return view('demopackage::index');
+});
+Route::get('/demo-config', [DemoController::class, 'showConfig']);
+Route::get('/demo-info', [DemoController::class, 'info']);
+
+// Apply middleware to group
+Route::middleware(['demo.package'])->group(function () {
+    Route::get('/demo-protected', [DemoController::class, 'index']);
 });
